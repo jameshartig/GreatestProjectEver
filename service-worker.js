@@ -1,18 +1,18 @@
 onmessage = function(event) {
-    console.log('onmessage', event);
     if (event.ports[0]) {
         var receivedPort = event.ports[0];
         receivedPort.onmessage = function() {
-            console.log('onport message!!!');
-            var title = 'Yay a message.';
-            var body = 'We have received a push message.';
-            var icon = '/images/icon-192x192.png';
-            var tag = 'simple-push-demo-notification-tag';
+            var title = 'Song playing yo',
+                body = 'Blerp',
+                icon = './200_3876906.jpg',
+                tag = 'a-song-is-playing';
 
             self.registration.showNotification(title, {
                 body: body,
                 icon: icon,
-                tag: tag
+                tag: tag,
+                silent: true,
+                sticky: true
             });
         };
     }
