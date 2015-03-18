@@ -8,6 +8,6 @@
       "type": "image/png"
     }
   ],
-  "start_url": "/notifs.html",
+  "start_url": "./notifs.html",
   "display": "standalone"
 }
