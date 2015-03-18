@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>CodePen - A Pen by James Hartig</title>
+
+</head>
+
+<body>
+
+<p id="error"></p>
+
+<button class="enable" disabled>Enable notifications</button>
+
+<button class="send" disabled>Send me stuffs</button>
+
+<script>
+
+    var serviceWorkerReg;
+
+    window.addEventListener('load', function() {
+        var enableButton = document.querySelector('.enable');
+        enableButton.addEventListener('click', function() {
+            Notification.requestPermission(function(status) {
+
+            });
+        });
+        // Check that service workers are supported, if so, progressively
+        // enhance and add push messaging support, otherwise continue without it.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/euKS').then(initializeState);
+        } else {
+            document.getElementById('error').innerText = 'Service workers aren\'t supported in this browser.';
+        }
+    });
+
+    // Once the service worker is registered set the initial state
+    function initializeState() {
+        var enableButton = document.querySelector('.enable');
+        // Are Notifications supported in the service worker?
+        if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+            document.getElementById('error').innerText = 'Notifications aren\'t supported.';
+            return;
+        }
+        if (!('MessageChannel' in window)) {
+            document.getElementById('error').innerText = 'MessageChannel isn\'t supported.';
+            return;
+        }
+
+        if (window.MessageChannel) {
+            var messageChannel = new MessageChannel();
+            messageChannel.port1.onmessage = function(event) {};
+        }
+
+        // Check the current Notification permission.
+        // If its denied, it's a permanent block until the
+        // user changes the permission
+        if (Notification.permission === 'denied') {
+            document.getElementById('error').innerText = 'The user has blocked notifications.';
+            return;
+        } else if (Notification.permission === 'granted') {
+            enableButton.textContent = 'Disable Push Messages';
+        }
+        enableButton.disabled = false;
+
+        // We need the service worker registration to check for a subscription
+        navigator.serviceWorker.ready.then(function(serviceWorkerRegistration) {
+            serviceWorkerReg = serviceWorkerRegistration;
+
+            if (Notification.permission === 'granted') {
+                var sendButton = document.querySelector('.send'),
+                    neutered = false;
+                sendButton.disabled = false;
+
+                sendButton.addEventListener('click', function() {
+                    if (neutered && messageChannel) {
+                        messageChannel.port1.postMessage('hi!!');
+                        return;
+                    }
+                    serviceWorkerRegistration.active.postMessage({
+                        text: 'hereyago',
+                        port: messageChannel && messageChannel.port2
+                    }, [messageChannel && messageChannel.port2]);
+                    neutered = true;
+                });
+            }
+
+
+            /*
+
+
+            // Do we already have a push message subscription?
+            serviceWorkerRegistration.pushManager.getSubscription().then(function(subscription) {
+                // Enable any UI which subscribes / unsubscribes from
+                // push messages.
+                var pushButton = document.querySelector('.js-push-button');
+                pushButton.disabled = false;
+
+                if (!subscription) {
+                    // We aren't subscribed to push, so set UI
+                    // to allow the user to enable push
+                    return;
+                }
+
+                // Keep your server in sync with the latest subscriptionId
+                sendSubscriptionToServer(subscription);
+
+                // Set your UI to show they have subscribed for
+                // push messages
+                pushButton.textContent = 'Disable Push Messages';
+            }).catch(function(err) {
+                document.getElementById('error').innerText = 'Error during getSubscription() ' + err.message;
+            });
+            */
+        });
+    }
+</script>
+
+</body>
+</html>
