@@ -1,0 +1,13 @@
+{
+  "name": "James Demo",
+  "short_name": "James Demo",
+  "icons": [
+    {
+      "src": "./favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/notifs.html",
+  "display": "standalone"
+}
