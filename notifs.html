@@ -31,7 +31,7 @@
         // Check that service workers are supported, if so, progressively
         // enhance and add push messaging support, otherwise continue without it.
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/euKS').then(initializeState);
+            navigator.serviceWorker.register('./service-worker.js').then(initializeState);
         } else {
             document.getElementById('error').innerText = 'Service workers aren\'t supported in this browser.';
         }
